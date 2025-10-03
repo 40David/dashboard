@@ -91,8 +91,7 @@ const IrrigationDashboard = () => {
             onClick={() => setActiveSection('live')}
           >
             Live Data
-          </button>slint-disable-next-line no-unused-vars
-  const [predictedMotorState, setPredictedMotorState] = useState(null);
+          </button>
           <button
             className={`px-8 py-3 rounded-lg text-base transition-all border-2 ${
               activeSection === 'history'
