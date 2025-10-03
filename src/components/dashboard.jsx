@@ -95,10 +95,10 @@ const IrrigationDashboard = () => {
   const isMotorOn = sensorData?.motor === 1;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-800 to-gray-700 text-gray-200 p-5 font-sans">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-gray-800 to-gray-700 text-gray-200 p-5 font-sans w-full">
+      <div className=" mx-auto">
         {/* Header */}
-        <header className="text-center mb-8 p-5 bg-white bg-opacity-5 rounded-xl backdrop-blur-sm">
+        <header className="text-center mb-8 p-5 bg-gray-700 bg-opacity-5 rounded-xl backdrop-blur-sm">
           <h1 className="text-4xl text-white mb-2">💧 Irrigation Dashboard</h1>
           <div className="text-gray-400 text-sm">
             Last updated: {currentTime.toLocaleTimeString()} - {currentTime.toLocaleDateString()}
@@ -109,7 +109,7 @@ const IrrigationDashboard = () => {
         </header>
 
         {/* Debug Info */}
-        <div className="bg-yellow-500 bg-opacity-10 border border-yellow-500 border-opacity-30 rounded-lg p-4 mb-5 font-mono text-sm">
+        <div className="bg-gray-700 bg-opacity-10 border border-yellow-500 border-opacity-30 rounded-lg p-4 mb-5 font-mono text-sm">
           <pre className="m-0 whitespace-pre-wrap">{debugInfo}</pre>
         </div>
 
@@ -118,8 +118,9 @@ const IrrigationDashboard = () => {
           <button
             className={`px-8 py-3 rounded-lg text-base transition-all border-2 ${
               activeSection === 'live'
-                ? 'bg-gray-600 border-gray-600 text-white'
-                : 'bg-white bg-opacity-10 border-white border-opacity-20 text-gray-200'
+
+                ? 'bg-gray-600 border-gray-900 text-white'
+                : 'bg-gray-800 border-gray-900 text-white'
             }`}
             onClick={() => setActiveSection('live')}
           >
@@ -128,8 +129,8 @@ const IrrigationDashboard = () => {
           <button
             className={`px-8 py-3 rounded-lg text-base transition-all border-2 ${
               activeSection === 'history'
-                ? 'bg-gray-600 border-gray-600 text-white'
-                : 'bg-white bg-opacity-10 border-white border-opacity-20 text-gray-200'
+              ? 'bg-gray-600 border-gray-900 text-white'
+                : 'bg-gray-800 border-gray-900 text-white'
             }`}
             onClick={() => setActiveSection('history')}
           >
@@ -170,10 +171,10 @@ const IrrigationDashboard = () => {
             </div>
 
             {/* Motor Control */}
-            <div className="bg-white bg-opacity-5 rounded-xl p-8 mb-8">
+            <div className="bg-gray-700 bg-opacity-5 rounded-xl p-8 mb-8">
               <h2 className="text-2xl mb-5 text-white">Motor Control</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-5">
-                <div className="bg-white bg-opacity-8 rounded-lg p-5 border-l-4 border-blue-400">
+                <div className="bg-gray-700 bg-opacity-8 rounded-lg p-5 border-l-4 border-blue-400">
                   <div className="text-lg font-semibold mb-4 flex items-center">
                     <span className={`inline-block w-3 h-3 rounded-full mr-2 ${isMotorOn ? 'bg-green-500' : 'bg-gray-600'}`}></span>
                     Irrigation Motor
@@ -197,7 +198,7 @@ const IrrigationDashboard = () => {
         {/* Historical Data Section */}
         {activeSection === 'history' && (
           <div>
-            <div className="bg-white bg-opacity-8 rounded-xl p-8 mb-8 border border-white border-opacity-10">
+            <div className="bg-gray=700 bg-opacity-8 rounded-xl p-8 mb-8 border border-white border-opacity-10">
               <h3 className="text-2xl mb-5 text-white">Temperature Trends</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={tempHistory}>
@@ -214,7 +215,7 @@ const IrrigationDashboard = () => {
               </ResponsiveContainer>
             </div>
 
-            <div className="bg-white bg-opacity-8 rounded-xl p-8 mb-8 border border-white border-opacity-10">
+            <div className="bg-gray-700 bg-opacity-8 rounded-xl p-8 mb-8 border border-white border-opacity-10">
               <h3 className="text-2xl mb-5 text-white">Motor Activity</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={[{ name: 'Motor Status', value: sensorData?.motor || 0 }]}>
@@ -237,7 +238,7 @@ const IrrigationDashboard = () => {
 
 // Sensor Card Component
 const SensorCard = ({ title, icon, value, unit, valueColor = '#74b9ff' }) => (
-  <div className="bg-white bg-opacity-8 rounded-xl p-6 border border-white border-opacity-10">
+  <div className="bg-gray-700 bg-opacity-8 rounded-xl p-6 border border-white border-opacity-10">
     <div className="flex justify-between items-center mb-5">
       <span className="text-lg text-white font-semibold">{title}</span>
       <div className="w-10 h-10 bg-white bg-opacity-10 rounded-full flex items-center justify-center text-xl">
