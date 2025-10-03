@@ -3,87 +3,53 @@ import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, L
 
 const IrrigationDashboard = () => {
   const [sensorData, setSensorData] = useState(null);
+  const [predictedMotorState, setPredictedMotorState] = useState(null);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [activeSection, setActiveSection] = useState('live');
   const [tempHistory, setTempHistory] = useState([]);
   const [debugInfo, setDebugInfo] = useState('Waiting for data...');
 
-  // Firebase config
-  const firebaseConfig = {
-    apiKey: "AIzaSyD8DujPWuLMSJYaWULv-f4bJW-9f5KZR7I",
-    authDomain: "irrigation-2bea8.firebaseapp.com",
-    databaseURL: "https://irrigation-2bea8-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "irrigation-2bea8",
-    storageBucket: "irrigation-2bea8.firebasestorage.app",
-    messagingSenderId: "641981848595",
-    appId: "1:641981848595:web:d4ffe51c186d4a0afb33e6"
-  };
-
-  // Initialize Firebase
   useEffect(() => {
-    const loadFirebase = async () => {
-      if (typeof window !== 'undefined') {
-        // Load Firebase scripts dynamically
-        if (!window.firebase) {
-          await new Promise((resolve, reject) => {
-            const script1 = document.createElement('script');
-            script1.src = 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js';
-            script1.onload = () => {
-              const script2 = document.createElement('script');
-              script2.src = 'https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js';
-              script2.onload = resolve;
-              script2.onerror = reject;
-              document.head.appendChild(script2);
-            };
-            script1.onerror = reject;
-            document.head.appendChild(script1);
+    const fetchData = async () => {
+      try {
+        const response = await fetch('/dashboard');
+        const data = await response.json();
+        setDebugInfo(`Data from /dashboard: ${JSON.stringify(data, null, 2)}`);
+        if (data) {
+          setSensorData(data);
+          const now = new Date();
+          const timeStr = now.toLocaleTimeString();
+          setTempHistory(prev => {
+            const newHistory = [...prev, { time: timeStr, temp: data.temp || 0 }];
+            return newHistory.slice(-20);
           });
+        } else {
+          setDebugInfo('No data found from /dashboard');
         }
-
-        // Wait for firebase to be available
-        await new Promise(resolve => {
-          const checkFirebase = setInterval(() => {
-            if (window.firebase && window.firebase.database) {
-              clearInterval(checkFirebase);
-              resolve();
-            }
-          }, 100);
-        });
-
-        if (!window.firebase.apps.length) {
-          window.firebase.initializeApp(firebaseConfig);
-        }
-        
-        const database = window.firebase.database();
-        const sensorRef = database.ref('irrigation/sensors 1');
-
-        sensorRef.on('value', (snapshot) => {
-          const data = snapshot.val();
-          setDebugInfo(`Database path: irrigation/sensors 1\nData: ${JSON.stringify(data, null, 2)}`);
-          
-          if (data) {
-            setSensorData(data);
-            
-            // Update temperature history
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString();
-            
-            setTempHistory(prev => {
-              const newHistory = [...prev, { time: timeStr, temp: data.temp || 0 }];
-              return newHistory.slice(-20);
-            });
-          } else {
-            setDebugInfo('No data found at path: irrigation/sensors 1');
-          }
-        }, (error) => {
-          setDebugInfo(`Error: ${error.message}`);
-        });
-
-        return () => sensorRef.off();
+      } catch (error) {
+        setDebugInfo(`Error fetching from /dashboard: ${error.message}`);
       }
     };
 
-    loadFirebase();
+    const fetchPrediction = async () => {
+      try {
+        const response = await fetch('/predict');
+        const data = await response.json();
+        setPredictedMotorState(data.prediction);
+      } catch (error) {
+        console.error("Error fetching prediction:", error);
+      }
+    };
+
+
+    fetchData();
+    fetchPrediction();
+    const interval = setInterval(() => {
+      fetchData();
+      fetchPrediction();
+    }, 5000); // Fetch data every 5 seconds
+
+    return () => clearInterval(interval);
   }, []);
 
   // Update clock
@@ -104,7 +70,7 @@ const IrrigationDashboard = () => {
             Last updated: {currentTime.toLocaleTimeString()} - {currentTime.toLocaleDateString()}
           </div>
           <div className="inline-block px-4 py-1 rounded-full text-sm mt-2 bg-green-500 bg-opacity-20 text-green-400">
-            ● Connected to Firebase
+            ● Connected to Express Backend
           </div>
         </header>
 
@@ -125,7 +91,8 @@ const IrrigationDashboard = () => {
             onClick={() => setActiveSection('live')}
           >
             Live Data
-          </button>
+          </button>slint-disable-next-line no-unused-vars
+  const [predictedMotorState, setPredictedMotorState] = useState(null);
           <button
             className={`px-8 py-3 rounded-lg text-base transition-all border-2 ${
               activeSection === 'history'
@@ -187,6 +154,10 @@ const IrrigationDashboard = () => {
                     <div className="text-center">
                       <div className="text-xs text-gray-400 mb-1">Status</div>
                       <div className="text-lg font-bold text-white">{isMotorOn ? 'Running' : 'Stopped'}</div>
+                    </div>
+                     <div className="text-center">
+                      <div className="text-xs text-gray-400 mb-1">Predicted State</div>
+                      <div className="text-lg font-bold text-white">{predictedMotorState ?? '--'}</div>
                     </div>
                   </div>
                 </div>
