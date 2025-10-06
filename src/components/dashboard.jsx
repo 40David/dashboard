@@ -12,9 +12,9 @@ const IrrigationDashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('/dashboard');
+        const response = await fetch('/sensor-data/ESP32_001');
         const data = await response.json();
-        setDebugInfo(`Data from /dashboard: ${JSON.stringify(data, null, 2)}`);
+        setDebugInfo(`Data from /sensor-data/ESP32_001: ${JSON.stringify(data, null, 2)}`);
         if (data) {
           setSensorData(data);
           const now = new Date();
@@ -24,10 +24,10 @@ const IrrigationDashboard = () => {
             return newHistory.slice(-20);
           });
         } else {
-          setDebugInfo('No data found from /dashboard');
+          setDebugInfo('No data found from /sensor-data/ESP32_001');
         }
       } catch (error) {
-        setDebugInfo(`Error fetching from /dashboard: ${error.message}`);
+        setDebugInfo(`Error fetching from /sensor-data/ESP32_001: ${error.message}`);
       }
     };
 
