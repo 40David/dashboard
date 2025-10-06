@@ -10,11 +10,12 @@ const IrrigationDashboard = () => {
   const [debugInfo, setDebugInfo] = useState('Waiting for data...');
 
   useEffect(() => {
+      const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const fetchData = async () => {
       try {
-        const response = await fetch('/sensor-data/ESP32_001');
+        const response = await fetch('${backendUrl}/sensor-data/ESP32_001');
         const data = await response.json();
-        setDebugInfo(`Data from /sensor-data/ESP32_001: ${JSON.stringify(data, null, 2)}`);
+        setDebugInfo(`Data from ${JSON.stringify(data, null, 2)}`);
         if (data) {
           setSensorData(data);
           const now = new Date();
@@ -33,7 +34,7 @@ const IrrigationDashboard = () => {
 
     const fetchPrediction = async () => {
       try {
-        const response = await fetch('/predict');
+        const response = await fetch(`${backendUrl}/predict`);
         const data = await response.json();
         setPredictedMotorState(data.prediction);
       } catch (error) {
