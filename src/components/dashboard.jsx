@@ -32,7 +32,7 @@ const IrrigationDashboard = () => {
 
 const fetchPrediction = async () => {
   try {
-    const response = await fetch(`${backendUrl}'/data/ESP32_001`);
+    const response = await fetch(`${backendUrl}/data/ESP32_001`);
     const data = await response.json();
     setPredictedMotorState(data.prediction);
   } catch (error) {
