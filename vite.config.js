@@ -1,12 +1,13 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import dotenv from 'dotenv'
+import tailwindcss from '@tailwindcss/vite'
 
 dotenv.config()
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), tailwindcss()],
   server: {
     // Proxy only used during local development to avoid CORS
     proxy: {
@@ -16,8 +17,5 @@ export default defineConfig({
         rewrite: path => path.replace(/^\/Data\/ESP32_001/, '/Data/ESP32_001'),
       },
     },
-  },
-  define: {
-    'process.env': process.env,
   },
 })
