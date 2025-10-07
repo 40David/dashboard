@@ -13,7 +13,7 @@ const IrrigationDashboard = () => {
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const fetchData = async () => {
   try {
-    const response = await fetch(`${backendUrl}/dashboard-data/ESP32_001`);
+    const response = await fetch(`${backendUrl}/data/ESP32_001`);
     const data = await response.json();
     setDebugInfo(`Data from ${JSON.stringify(data, null, 2)}`);
     if (data) {
