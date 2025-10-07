@@ -13,12 +13,12 @@ export default defineConfig({
       '/sensor-data/ESP32_001': {
         target: process.env.VITE_BACKEND_URL,
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/dashboard-data\/ESP32_001/, '/dashboard'),
+        rewrite: (path) => path.replace(/^\/data\/ESP32_001/, '/dashboard'),
       },
        '/predict': {
         target: process.env.VITE_BACKEND_URL,
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/dashboard-data\/ESP32_001/, '/dashboard'),
+        rewrite: (path) => path.replace(/^\/data\/ESP32_001/, '/dashboard'),
       },
     },
   },
