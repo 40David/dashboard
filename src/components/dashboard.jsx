@@ -13,7 +13,7 @@ const IrrigationDashboard = () => {
       const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const fetchData = async () => {
       try {
-        const response = await fetch('${backendUrl}/sensor-data/ESP32_001');
+        const response = await fetch('${backendUrl}/dashboard-data/{ESP32_001}');
         const data = await response.json();
         setDebugInfo(`Data from ${JSON.stringify(data, null, 2)}`);
         if (data) {
@@ -25,16 +25,16 @@ const IrrigationDashboard = () => {
             return newHistory.slice(-20);
           });
         } else {
-          setDebugInfo('No data found from /sensor-data/ESP32_001');
+          setDebugInfo('No data found from /dashboard-data/ESP32_001');
         }
       } catch (error) {
-        setDebugInfo(`Error fetching from /sensor-data/ESP32_001: ${error.message}`);
+        setDebugInfo(`Error fetching from /dashboard-data/ESP32_00}: ${error.message}`);
       }
     };
 
     const fetchPrediction = async () => {
       try {
-        const response = await fetch(`${backendUrl}/predict`);
+        const response = await fetch('${backendUrl}/dashboard-data/ESP32_001');
         const data = await response.json();
         setPredictedMotorState(data.prediction);
       } catch (error) {
@@ -113,7 +113,7 @@ const IrrigationDashboard = () => {
               <SensorCard
                 title="Temperature"
                 icon="🌡️"
-                value={sensorData?.temp?.toFixed(1) || '--'}
+                value={sensorData?.temperature?.toFixed(1) || '--'}
                 unit="°C"
               />
               <SensorCard
@@ -125,7 +125,7 @@ const IrrigationDashboard = () => {
               <SensorCard
                 title="Soil Moisture"
                 icon="🌱"
-                value={sensorData?.moisture?.toFixed(0) || '--'}
+                value={sensorData?.soil_moistu?.toFixed(0) || '--'}
                 unit="%"
               />
               <SensorCard
@@ -189,7 +189,7 @@ const IrrigationDashboard = () => {
             <div className="bg-gray-700 bg-opacity-8 rounded-xl p-8 mb-8 border border-white border-opacity-10">
               <h3 className="text-2xl mb-5 text-white">Motor Activity</h3>
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={[{ name: 'Motor Status', value: sensorData?.motor || 0 }]}>
+                <BarChart data={[{ name: 'Motor Status', value: sensorData?.prediction || 0 }]}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
                   <XAxis dataKey="name" stroke="#b0b0b0" />
                   <YAxis domain={[0, 1]} ticks={[0, 1]} stroke="#b0b0b0" />
