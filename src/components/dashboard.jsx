@@ -26,13 +26,13 @@ const IrrigationDashboard = () => {
       });
     }
   } catch (error) {
-    setDebugInfo(`Error fetching from /dashboard-data/ESP32_001: ${error.message}`);
+    setDebugInfo(`Error fetching from /data/ESP32_001: ${error.message}`);
   }
 };
 
 const fetchPrediction = async () => {
   try {
-    const response = await fetch(`${backendUrl}'/dashboard-data/ESP32_001`);
+    const response = await fetch(`${backendUrl}'/data/ESP32_001`);
     const data = await response.json();
     setPredictedMotorState(data.prediction);
   } catch (error) {
