@@ -12,36 +12,33 @@ const IrrigationDashboard = () => {
   useEffect(() => {
       const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const fetchData = async () => {
-      try {
-        const response = await fetch('${backendUrl}/dashboard-data/ESP32_001');
-        const data = await response.json();
-        setDebugInfo(`Data from ${JSON.stringify(data, null, 2)}`);
-        if (data) {
-          setSensorData(data);
-          const now = new Date();
-          const timeStr = now.toLocaleTimeString();
-          setTempHistory(prev => {
-            const newHistory = [...prev, { time: timeStr, temp: data.temp || 0 }];
-            return newHistory.slice(-20);
-          });
-        } else {
-          setDebugInfo('No data found from /dashboard-data/ESP32_001');
-        }
-      } catch (error) {
-        setDebugInfo(`Error fetching from /dashboard-data/ESP32_00}: ${error.message}`);
-      }
-    };
+  try {
+    const response = await fetch(`${backendUrl}/dashboard-data/ESP32_001`);
+    const data = await response.json();
+    setDebugInfo(`Data from ${JSON.stringify(data, null, 2)}`);
+    if (data) {
+      setSensorData(data);
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString();
+      setTempHistory(prev => {
+        const newHistory = [...prev, { time: timeStr, temp: data.temperature || 0 }];
+        return newHistory.slice(-20);
+      });
+    }
+  } catch (error) {
+    setDebugInfo(`Error fetching from /dashboard-data/ESP32_001: ${error.message}`);
+  }
+};
 
-    const fetchPrediction = async () => {
-      try {
-        const response = await fetch('${backendUrl}/dashboard-data/ESP32_001');
-        const data = await response.json();
-        setPredictedMotorState(data.prediction);
-      } catch (error) {
-        console.error("Error fetching prediction:", error);
-      }
-    };
-
+const fetchPrediction = async () => {
+  try {
+    const response = await fetch(`${backendUrl}/dashboard-data/ESP32_001`);
+    const data = await response.json();
+    setPredictedMotorState(data.prediction);
+  } catch (error) {
+    console.error("Error fetching prediction:", error);
+  }
+};
 
     fetchData();
     fetchPrediction();
