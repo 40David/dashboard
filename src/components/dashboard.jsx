@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const IrrigationDashboard = () => {
-  const [sensorData, setSensorData] = useState(null);
+  const [data, setdata] = useState(null);
   const [predictedMotorState, setPredictedMotorState] = useState(null);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [activeSection, setActiveSection] = useState('live');
@@ -17,7 +17,7 @@ const IrrigationDashboard = () => {
     const data = await response.json();
     setDebugInfo(`Data from ${JSON.stringify(data, null, 2)}`);
     if (data) {
-      setSensorData(data);
+      setdata(data);
       const now = new Date();
       const timeStr = now.toLocaleTimeString();
       setTempHistory(prev => {
@@ -26,7 +26,7 @@ const IrrigationDashboard = () => {
       });
     }
   } catch (error) {
-    setDebugInfo(`Error fetching from /dats: ${error.message}`);
+    setDebugInfo(`Error fetching from /data: ${error.message}`);
   }
 };
 
@@ -56,7 +56,7 @@ const fetchPrediction = async () => {
     return () => clearInterval(timer);
   }, []);
 
-  const isMotorOn = sensorData?.motor === 1;
+  const isMotorOn = data?.motor === 1;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-800 to-gray-700 text-gray-200 p-5 font-sans w-full">
@@ -110,27 +110,27 @@ const fetchPrediction = async () => {
               <SensorCard
                 title="Temperature"
                 icon="🌡️"
-                value={sensorData?.temperature?.toFixed(1) || '--'}
+                value={data?.temperature?.toFixed(1) || '--'}
                 unit="°C"
               />
               <SensorCard
                 title="Humidity"
                 icon="💧"
-                value={sensorData?.humidity?.toFixed(0) || '--'}
+                value={data?.humidity?.toFixed(0) || '--'}
                 unit="%"
               />
               <SensorCard
                 title="Soil Moisture"
                 icon="🌱"
-                value={sensorData?.moisture?.toFixed(0) || '--'}
+                value={data?.moisture?.toFixed(0) || '--'}
                 unit="%"
               />
               <SensorCard
                 title="Motor Status"
                 icon="⚙️"
-                value={sensorData?.motor ? 'ON' : 'OFF'}
+                value={data?.motor ? 'ON' : 'OFF'}
                 unit="Status"
-                valueColor={sensorData?.motor ? '#00b894' : '#636e72'}
+                valueColor={data?.motor ? '#00b894' : '#636e72'}
               />
             </div>
 
