@@ -10,12 +10,5 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
     // Proxy only used during local development to avoid CORS
-    proxy: {
-      '/data': {
-        target: process.env.VITE_BACKEND_URL, // your backend URL
-        changeOrigin: true,
-        rewrite: path => path.replace(/data/, '/data'),
-      },
-    },
   },
 })

@@ -12,40 +12,32 @@ const IrrigationDashboard = () => {
   useEffect(() => {
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const fetchData = async () => {
-  try {
-    const response = await fetch(`${backendUrl}/data`);
-    const data = await response.json();
-    setDebugInfo(`Data from ${JSON.stringify(data, null, 2)}`);
-    if (data) {
-      setSensorData(data);
-      const now = new Date();
-      const timeStr = now.toLocaleTimeString();
-      setTempHistory(prev => {
-        const newHistory = [...prev, { time: timeStr, temp: data.temperature || 0 }];
-        return newHistory.slice(-20);
-      });
-    }
-  } catch (error) {
-    setDebugInfo(`Error fetching from /data: ${error.message}`);
-  }
-};
+      try {
+        const response = await fetch(`${backendUrl}/data`);
+        const data = await response.json();
+        setDebugInfo(`Data from ${JSON.stringify(data, null, 2)}`);
+        if (data && data.length > 0) {
+          // The backend returns data sorted with the latest entry first.
+          const latestData = data[0];
+          setSensorData(latestData);
+          setPredictedMotorState(latestData.predicted_motor);
 
-const fetchPrediction = async () => {
-  try {
-    const response = await fetch(`${backendUrl}/data`);
-    const data = await response.json();
-    setPredictedMotorState(data.prediction);
-  } catch (error) {
-    console.error("Error fetching prediction:", error);
-  }
-};
+          // The history should be displayed in chronological order.
+          const history = data.map(item => ({
+            time: new Date(item.timestamp).toLocaleTimeString(),
+            temp: item.temperature || 0,
+            motor: item.motor || 0
+          })).reverse();
+
+          setTempHistory(history);
+        }
+      } catch (error) {
+        setDebugInfo(`Error fetching from /data: ${error.message}`);
+      }
+    };
 
     fetchData();
-    fetchPrediction();
-    const interval = setInterval(() => {
-      fetchData();
-      fetchPrediction();
-    }, 5000); // Fetch data every 5 seconds
+    const interval = setInterval(fetchData, 5000); // Fetch data every 5 seconds
 
     return () => clearInterval(interval);
   }, []);
@@ -128,9 +120,9 @@ const fetchPrediction = async () => {
               <SensorCard
                 title="Motor Status"
                 icon="⚙️"
-                value={sensorData?.motor ? 'ON' : 'OFF'}
+                value={predictedMotorState === 1 ? 'ON' : predictedMotorState === 0 ? 'OFF' : '--'}
                 unit="Status"
-                valueColor={sensorData?.motor ? '#00b894' : '#636e72'}
+                valueColor={predictedMotorState === 1 ? '#00b894' : '#636e72'}
               />
             </div>
 
@@ -154,7 +146,7 @@ const fetchPrediction = async () => {
                     </div>
                      <div className="text-center">
                       <div className="text-xs text-gray-400 mb-1">Predicted State</div>
-                      <div className="text-lg font-bold text-white">{predictedMotorState ?? '--'}</div>
+                      <div className="text-lg font-bold text-white">{predictedMotorState === 1 ? 'ON' : predictedMotorState === 0 ? 'OFF' : '--'} ({predictedMotorState})</div>
                     </div>
                   </div>
                 </div>
@@ -186,14 +178,15 @@ const fetchPrediction = async () => {
             <div className="bg-gray-700 bg-opacity-8 rounded-xl p-8 mb-8 border border-white border-opacity-10">
               <h3 className="text-2xl mb-5 text-white">Motor Activity</h3>
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={[{ name: 'Motor Status', value: sensorData?.prediction || 0 }]}>
+                <BarChart data={tempHistory}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                  <XAxis dataKey="name" stroke="#b0b0b0" />
+                  <XAxis dataKey="time" stroke="#b0b0b0" />
                   <YAxis domain={[0, 1]} ticks={[0, 1]} stroke="#b0b0b0" />
                   <Tooltip 
                     contentStyle={{ backgroundColor: '#2d3436', border: '1px solid #636e72' }}
                   />
-                  <Bar dataKey="value" fill={isMotorOn ? '#00b894' : '#636e72'} radius={8} />
+                  <Legend wrapperStyle={{ color: '#e4e4e4' }} />
+                  <Bar dataKey="motor" fill="#00b894" radius={4} name="Motor State" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
