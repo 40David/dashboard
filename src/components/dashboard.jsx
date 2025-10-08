@@ -7,22 +7,24 @@ const IrrigationDashboard = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [activeSection, setActiveSection] = useState('live');
   const [tempHistory, setTempHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [debugInfo, setDebugInfo] = useState('Waiting for data...');
 
   useEffect(() => {
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const fetchData = async () => {
+      setLoading(true);
+      setError(null);
       try {
         const response = await fetch(`${backendUrl}/data`);
         const data = await response.json();
         setDebugInfo(`Data from ${JSON.stringify(data, null, 2)}`);
         if (data && data.length > 0) {
-          // The backend returns data sorted with the latest entry first.
           const latestData = data[0];
           setSensorData(latestData);
           setPredictedMotorState(latestData.predicted_motor);
 
-          // The history should be displayed in chronological order.
           const history = data.map(item => ({
             time: new Date(item.timestamp).toLocaleTimeString(),
             temp: item.temperature || 0,
@@ -30,9 +32,14 @@ const IrrigationDashboard = () => {
           })).reverse();
 
           setTempHistory(history);
+        } else {
+          setSensorData(null);
         }
       } catch (error) {
+        setError(`Error fetching from /data: ${error.message}`);
         setDebugInfo(`Error fetching from /data: ${error.message}`);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -49,6 +56,18 @@ const IrrigationDashboard = () => {
   }, []);
 
   const isMotorOn = sensorData?.motor === 1;
+
+  if (loading) {
+    return <div className="min-h-screen bg-gray-800 text-white flex justify-center items-center">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="min-h-screen bg-gray-800 text-white flex justify-center items-center">{error}</div>;
+  }
+
+  if (!sensorData) {
+    return <div className="min-h-screen bg-gray-800 text-white flex justify-center items-center">No data available</div>;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-800 to-gray-700 text-gray-200 p-5 font-sans w-full">
@@ -120,9 +139,9 @@ const IrrigationDashboard = () => {
               <SensorCard
                 title="Motor Status"
                 icon="⚙️"
-                value={predictedMotorState === 1 ? 'ON' : predictedMotorState === 0 ? 'OFF' : '--'}
+                value={predictedMotorState ? 'ON' : 'OFF'}
                 unit="Status"
-                valueColor={predictedMotorState === 1 ? '#00b894' : '#636e72'}
+                valueColor={predictedMotorState ? '#00b894' : '#636e72'}
               />
             </div>
 
@@ -146,7 +165,7 @@ const IrrigationDashboard = () => {
                     </div>
                      <div className="text-center">
                       <div className="text-xs text-gray-400 mb-1">Predicted State</div>
-                      <div className="text-lg font-bold text-white">{predictedMotorState === 1 ? 'ON' : predictedMotorState === 0 ? 'OFF' : '--'} ({predictedMotorState})</div>
+                      <div className="text-lg font-bold text-white">{predictedMotorState ? 'ON' : 'OFF'}</div>
                     </div>
                   </div>
                 </div>
@@ -154,7 +173,6 @@ const IrrigationDashboard = () => {
             </div>
           </div>
         )}
-
         {/* Historical Data Section */}
         {activeSection === 'history' && (
           <div>
@@ -165,7 +183,7 @@ const IrrigationDashboard = () => {
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
                   <XAxis dataKey="time" stroke="#b0b0b0" />
                   <YAxis stroke="#b0b0b0" />
-                  <Tooltip 
+                  <Tooltip
                     contentStyle={{ backgroundColor: '#2d3436', border: '1px solid #636e72' }}
                     labelStyle={{ color: '#e4e4e4' }}
                   />
@@ -182,7 +200,7 @@ const IrrigationDashboard = () => {
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
                   <XAxis dataKey="time" stroke="#b0b0b0" />
                   <YAxis domain={[0, 1]} ticks={[0, 1]} stroke="#b0b0b0" />
-                  <Tooltip 
+                  <Tooltip
                     contentStyle={{ backgroundColor: '#2d3436', border: '1px solid #636e72' }}
                   />
                   <Legend wrapperStyle={{ color: '#e4e4e4' }} />
