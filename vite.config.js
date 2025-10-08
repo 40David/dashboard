@@ -11,7 +11,7 @@ export default defineConfig({
   server: {
     // Proxy only used during local development to avoid CORS
     proxy: {
-      '/Data': {
+      '/data': {
         target: process.env.VITE_BACKEND_URL, // your backend URL
         changeOrigin: true,
         rewrite: path => path.replace(/data/, '/data'),
