@@ -13,7 +13,7 @@ const IrrigationDashboard = () => {
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const fetchData = async () => {
   try {
-    const response = await fetch(`${backendUrl}/data/ESP32_001`);
+    const response = await fetch(`${backendUrl}/data`);
     const data = await response.json();
     setDebugInfo(`Data from ${JSON.stringify(data, null, 2)}`);
     if (data) {
@@ -26,13 +26,13 @@ const IrrigationDashboard = () => {
       });
     }
   } catch (error) {
-    setDebugInfo(`Error fetching from /data/ESP32_001: ${error.message}`);
+    setDebugInfo(`Error fetching from /dats: ${error.message}`);
   }
 };
 
 const fetchPrediction = async () => {
   try {
-    const response = await fetch(`${backendUrl}/data/ESP32_001`);
+    const response = await fetch(`${backendUrl}/data`);
     const data = await response.json();
     setPredictedMotorState(data.prediction);
   } catch (error) {
@@ -122,15 +122,15 @@ const fetchPrediction = async () => {
               <SensorCard
                 title="Soil Moisture"
                 icon="🌱"
-                value={sensorData?.soil_moistu?.toFixed(0) || '--'}
+                value={sensorData?.moisture?.toFixed(0) || '--'}
                 unit="%"
               />
               <SensorCard
                 title="Motor Status"
                 icon="⚙️"
-                value={isMotorOn ? 'ON' : 'OFF'}
+                value={sensorData?.motor ? 'ON' : 'OFF'}
                 unit="Status"
-                valueColor={isMotorOn ? '#00b894' : '#636e72'}
+                valueColor={sensorData?.motor ? '#00b894' : '#636e72'}
               />
             </div>
 

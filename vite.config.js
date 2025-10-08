@@ -11,10 +11,10 @@ export default defineConfig({
   server: {
     // Proxy only used during local development to avoid CORS
     proxy: {
-      '/Data/ESP32_001': {
+      '/Data': {
         target: process.env.VITE_BACKEND_URL, // your backend URL
         changeOrigin: true,
-        rewrite: path => path.replace(/^\/Data\/ESP32_001/, '/Data/ESP32_001'),
+        rewrite: path => path.replace(/data/, '/data'),
       },
     },
   },
