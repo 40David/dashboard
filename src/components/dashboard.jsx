@@ -44,7 +44,7 @@ const IrrigationDashboard = () => {
     };
 
     fetchData();
-    const interval = setInterval(fetchData); // Fetch data every 5 seconds
+    const interval = setInterval(fetchData, 500000); // Fetch data every 5 seconds
 
     return () => clearInterval(interval);
   }, []);
