@@ -19,11 +19,15 @@ const IrrigationDashboard = () => {
       try {
         const response = await fetch(`${backendUrl}/data`);
         const data = await response.json();
+        console.log("Raw data from backend:", data);
         setDebugInfo(`Data from ${JSON.stringify(data, null, 2)}`);
         if (data && data.length > 0) {
-          const latestData = data[0];
+          const latestData = data[data.length - 1];
+          console.log("Latest data extracted:", latestData);
           setSensorData(latestData);
           setPredictedMotorState(latestData.predicted_motor);
+          console.log("sensorData after set:", latestData);
+          console.log("predictedMotorState after set:", latestData.predicted_motor);
 
           const history = data.map(item => ({
             time: new Date(item.timestamp).toLocaleTimeString(),
@@ -38,13 +42,14 @@ const IrrigationDashboard = () => {
       } catch (error) {
         setError(`Error fetching from /data: ${error.message}`);
         setDebugInfo(`Error fetching from /data: ${error.message}`);
+        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-    const interval = setInterval(fetchData, 500000); // Fetch data every 5 seconds
+    const interval = setInterval(fetchData, 5000); // Fetch data every 5 seconds
 
     return () => clearInterval(interval);
   }, []);
@@ -83,10 +88,7 @@ const IrrigationDashboard = () => {
           </div>
         </header>
 
-        {/* Debug Info */}
-        <div className="bg-gray-700 bg-opacity-10 border border-yellow-500 border-opacity-30 rounded-lg p-4 mb-5 font-mono text-sm">
-          <pre className="m-0 whitespace-pre-wrap">{debugInfo}</pre>
-        </div>
+
 
         {/* Navigation */}
         <nav className="flex justify-center gap-2 mb-8">
@@ -216,17 +218,20 @@ const IrrigationDashboard = () => {
 };
 
 // Sensor Card Component
-const SensorCard = ({ title, icon, value, unit, valueColor = '#74b9ff' }) => (
-  <div className="bg-gray-700 bg-opacity-8 rounded-xl p-6 border border-white border-opacity-10">
-    <div className="flex justify-between items-center mb-5">
-      <span className="text-lg text-white font-semibold">{title}</span>
-      <div className="w-10 h-10 bg-white bg-opacity-10 rounded-full flex items-center justify-center text-xl">
-        {icon}
+const SensorCard = ({ title, icon, value, unit, valueColor = '#74b9ff' }) => {
+  console.log(`SensorCard: ${title} received value: ${value}`);
+  return (
+    <div className="bg-gray-700 bg-opacity-8 rounded-xl p-6 border border-white border-opacity-10">
+      <div className="flex justify-between items-center mb-5">
+        <span className="text-lg text-white font-semibold">{title}</span>
+        <div className="w-10 h-10 bg-white bg-opacity-10 rounded-full flex items-center justify-center text-xl">
+          {icon}
+        </div>
       </div>
+      <div className="text-4xl font-bold mb-2" style={{ color: valueColor }}>{value}</div>
+      <div className="text-gray-400 text-sm">{unit}</div>
     </div>
-    <div className="text-4xl font-bold mb-2" style={{ color: valueColor }}>{value}</div>
-    <div className="text-gray-400 text-sm">{unit}</div>
-  </div>
-);
+  );
+};
 
 export default IrrigationDashboard;
